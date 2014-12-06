@@ -224,12 +224,13 @@ void CA_damage_live_players( int dodamage )
 
 			p->s.v.health = p->s.v.health - dodamage;
 
-			if ( p->s.v.health <= 0 )
-			{
+			if ( p->s.v.health <= 0 ) {
 				G_bprint (PRINT_MEDIUM, "%s ran out of health\n", p->s.v.netname);
+		                p->s.v.solid		 = SOLID_NOT;
+		                p->vw_index		 = 0;
+		                setmodel( p, "" );
 			}
-			else
-			{
+			else {
 				sound( p, CHAN_VOICE, va("player/pain%d.wav", i_rnd(1,6)), 1, ATTN_NORM );
 			}
 		}
