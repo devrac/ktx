@@ -237,6 +237,17 @@ void CA_damage_live_players( int dodamage )
 	}
 }
 
+void CA_print_winners_health(void)
+{
+    gedict_t *p;
+    for( p = world; (p = find_plr( p )); )
+    {
+        if ( ISLIVE( p ) ) {
+            G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n", p->s.v.netname, Q_rint(p->s.v.armorvalue), Q_rint(p->s.v.health));
+        }
+    }
+}
+
 void CA_PrintScores(void)
 {
 	int s1 = team1_score;
@@ -306,12 +317,13 @@ void CA_Frame(void)
 				{
 					sound (world, CHAN_AUTO + CHAN_NO_PHS_ADD, "ca/sfdraw.wav", 1, ATTN_NONE);
 					G_cp2all("%s", redtext("DRAW!"));
-					ra_match_fight = 0;
 					break;
 				}
 			case 1: // Only one team alive
 				{
 					G_bprint(2, "%s \x90%s\x91 wins round\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)));
+                    CA_print_winners_health();
+
 					if ( alive_team == 1 )
 					{
 						team1_score++;
@@ -321,11 +333,11 @@ void CA_Frame(void)
 						team2_score++;
 					}
 					round_num++;
-					ra_match_fight = 0;
 					break;
 				}
 			default: break; // both teams alive
 		}
+        ra_match_fight = 0;
 	}
 
 	if ( team1_score >= CA_wins_required() || team2_score >= CA_wins_required() )
