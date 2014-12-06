@@ -83,8 +83,7 @@ void ToggleCArena()
 	if ( !is_rules_change_allowed() )
 		return;
 
-	if ( !isCA() )
-	{
+	if ( !isCA() ) {
 		// seems we trying turn CA on.
 		if ( !isTeam() )
 		{
