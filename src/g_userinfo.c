@@ -51,7 +51,7 @@ cmdinfo_t cinfos[] = {
 //    { "e-mail", 0 },
     { "ev", info_ev_update },
 
-//    { "fs", 0 }, // for force_spec 
+//    { "fs", 0 }, // for force_spec
 
 //	{ "gender", 0 },
 
@@ -145,7 +145,7 @@ void cmduinfo ()
 		G_sprint(self, 2, "%s's personal keys:\n", p->s.v.netname);
 
 		for ( i = 0; i < cinfos_cnt; i++ ) {
-			
+
 			if ( isSysKey( cinfos[i].key ) )
 				continue; // sys keys is not showed for mortals %)
 
@@ -280,6 +280,10 @@ qbool FixPlayerTeam ( char *newteam )
 	if ( self->ct == ctSpec )
 		return false;
 
+    if ( isCA() ) {
+        return false;
+    }
+
 	// do not allow change team in game / countdown
 	if( match_in_progress || coop )
 	{
@@ -334,7 +338,7 @@ qbool FixPlayerTeam ( char *newteam )
 			stuffcmd_flags(self, STUFFCMD_IGNOREINDEMO, "team \"%s\"\n", s2); // sends this to client - so he get right team too
 			return true;
 		}
-		stuffcmd_flags(self, STUFFCMD_IGNOREINDEMO, "color %d\n", streq(s1, "red") ? 4 : 13); 
+		stuffcmd_flags(self, STUFFCMD_IGNOREINDEMO, "color %d\n", streq(s1, "red") ? 4 : 13);
 	}
 
 	if ( !match_in_progress && ( isTeam() || isCTF() ) && self->ready && strnull( newteam ) ) {

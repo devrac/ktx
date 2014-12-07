@@ -164,7 +164,7 @@ typedef struct player_stats_s {
 
 	// instagib stats
 	int i_height;	// Cumulated height  of airgibs
-	int i_maxheight;	
+	int i_maxheight;
 	int i_cggibs;
 	int i_axegibs;
 	int i_stompgibs;
@@ -409,7 +409,7 @@ typedef struct gedict_s {
 	int		k_captain;       // if player is team captain
 	float	k_flag;          // flagvalue to customise settings such as sounds/autoscreenshot
 	float	k_msgcount;      // NOT_SURE: last time mod printed a message to client?
-	float	k_picked;        // NOT_SURE: 
+	float	k_picked;        // NOT_SURE:
 	int		k_stuff;         // if player has received stuffed aliases|commands
 // k_stuff flags
 #define STUFF_MAPS     (1<<0)
@@ -417,9 +417,9 @@ typedef struct gedict_s {
 
 	float	k_teamnumber;    // team the player is a member of, 1 = team1, 2 = team2
 	float	k_teamnum;       // NOT_SURE:
-	
+
 	float lastwepfired;
-	
+
 //	float maxspeed;       // Used to set Maxspeed on a player moved from old qw defs.qc
 
 	float suicide_time;	// can't suicide sooner than this
@@ -495,7 +495,7 @@ typedef struct gedict_s {
 	qbool on_hook;              // are we on the grapple?
 	qbool hook_out;             // is the grapple in flight?
 	int ctf_flag;                  // do we have a rune or flag?
-	float ctf_freeze;              // removes jitterness from grapple 
+	float ctf_freeze;              // removes jitterness from grapple
 	float regen_time;              // time to update health if regen rune
 	float rune_sound_time;         // dont spam rune sounds (1 per second)
 	float carrier_frag_time;       // used for carrier assists
@@ -540,6 +540,7 @@ typedef struct gedict_s {
 
 // { Clan Arena
 	qbool ca_alive;
+    char *ca_oldteam;
 // }
 
 // {
@@ -582,13 +583,13 @@ typedef struct gedict_s {
 	float		mid_top_rl_efficiency;
 
 // { race
-	int 		race_id; 			// used by checkpoints, 
+	int 		race_id; 			// used by checkpoints,
 				 					// start checkpoint have id = 0,
 				 					// intermediate checkpoints have it from 1 to xxx,
 				 					// and end checkpoint have id xxx + 1
 	float		race_volume; 		// how loud to play sound() when you tocuh this checkpoint
 	int			race_effects; 		// apply this effects when checkpoint is touched
-	int			race_RouteNodeType; // this is actually must be raceRouteNodeType_t 
+	int			race_RouteNodeType; // this is actually must be raceRouteNodeType_t
 									// but unwilling to move type definition out of race.c so using int
 
 	int			race_ready; 		// is player ready for race
@@ -660,7 +661,7 @@ typedef struct
 	raceFalseStartMode_t	falsestart;				// start mode
 	raceRouteNode_t			node[MAX_ROUTE_NODES];	// nodes of this route, fixed array, yeah I'm lazy
 } raceRoute_t;
- 
+
 typedef struct
 {
 	float					time;
@@ -674,14 +675,14 @@ typedef struct
 	raceWeapoMode_t			weaponmode;					// weapon mode
 	raceFalseStartMode_t	startmode;				// start mode
 } raceRecord_t;
- 
+
 typedef enum
 {
        raceNone = 0,                // race is inactive
        raceCD,                                // race in count down state
        raceActive,                        // race is active
 } raceStatus_t;
- 
+
 #define NUM_CHASECAMS	4 // number of camera views defined
 #define NUM_BESTSCORES	10
 
@@ -715,7 +716,7 @@ typedef struct
 	int						next_racer;			// this is queue of racers
 
 	raceWeapoMode_t			weapon;				// weapon mode
-	
+
 	raceFalseStartMode_t	falsestart;			// start type
 
 	raceStatus_t			status;				// race status

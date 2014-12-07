@@ -144,9 +144,12 @@ void CA_PutClientInServer(void)
 	if ( ISDEAD( self ) )
 	{
 		self->s.v.solid		 = SOLID_NOT;
-		self->s.v.movetype	 = MOVETYPE_NOCLIP;
+		//self->s.v.movetype	 = MOVETYPE_NOCLIP;
+        self->s.v.movetype     = MOVETYPE_WALK;
 		self->vw_index		 = 0;
 		setmodel( self, "" );
+        self->s.v.armorvalue   = 666;
+        self->s.v.health       = 666;
 
 		setorigin (self, PASSVEC3( self->s.v.origin ) );
 	}
@@ -276,6 +279,43 @@ void CA_TeamsStats(void)
 	}
 }
 
+void CA_SetDeadTeams(void)
+{
+    gedict_t *p;
+    char *deadteam = redtext("dead");
+
+    if(ra_match_fight != 2){
+        return;
+    }
+
+    for( p = world; (p = find_plr( p )); )
+    {
+        if( ISDEAD(p) && strneq(getteam(p),deadteam) ) {
+            stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo oldteam \"%s\"\n", getteam(p));
+            stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo team \"%s\"\n", deadteam);
+        }
+    }
+}
+
+void CA_StoreTeams(void)
+{
+    gedict_t *p;
+    for( p = world; (p = find_plr( p )); )
+    {
+        p->ca_oldteam = getteam(p);
+        stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo oldteam \"%s\"\n", getteam(p));
+    }
+}
+
+void CA_RestoreTeams(void)
+{
+    gedict_t *p;
+    for( p = world; (p = find_plr( p )); )
+    {
+        stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo team \"%s\"\n", ezinfokey(p,"oldteam"));
+    }
+}
+
 void CA_Frame(void)
 {
 	/*
@@ -303,10 +343,19 @@ void CA_Frame(void)
 		return;
 
 	// check if there exist only one team with alive players and others are eliminated, if so then its time to start end timer
-	if ( ra_match_fight == 2 && CA_check_alive_teams( &alive_team ) <= 1 ) {
-		time_to_end = g_globalvars.time + 3;
-		ra_match_fight = 3;
-		return;
+	if ( ra_match_fight == 2 )
+    {
+        if(CA_check_alive_teams( &alive_team ) <= 1 )
+        {
+		    time_to_end = g_globalvars.time + 3;
+            CA_RestoreTeams();
+    		ra_match_fight = 3;
+    		return;
+        }
+        else
+        {
+            CA_SetDeadTeams();
+        }
 	}
 
 	if ( ra_match_fight == 3 && Q_rint( time_to_end - g_globalvars.time ) <= 0)
@@ -321,6 +370,7 @@ void CA_Frame(void)
 				}
 			case 1: // Only one team alive
 				{
+                    G_cp2all("%s \x90%s\x91 wins round\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)));
 					G_bprint(2, "%s \x90%s\x91 wins round\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)));
                     CA_print_winners_health();
 
@@ -337,8 +387,13 @@ void CA_Frame(void)
 				}
 			default: break; // both teams alive
 		}
-        ra_match_fight = 0;
+        ra_match_fight = 4;
 	}
+
+    if ( ra_match_fight == 4 && Q_rint( time_to_end - g_globalvars.time ) <= -3)
+    {
+        ra_match_fight = 0;
+    }
 
 	if ( team1_score >= CA_wins_required() || team2_score >= CA_wins_required() )
 	{
@@ -351,6 +406,8 @@ void CA_Frame(void)
 		// ok start ra timer
 		ra_match_fight = 1; // ra countdown
 		last_r = 999999999;
+        CA_StoreTeams();
+
 		time_to_start  = g_globalvars.time + 9;
 
 		for( p = world; (p = find_plr( p )); )
