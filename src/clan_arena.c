@@ -549,7 +549,7 @@ void CA_Frame(void)
 
 		ra_match_fight = 2;
 
-		time_to_sudden_death = g_globalvars.time + 120;
+		time_to_sudden_death = g_globalvars.time + 210;
 
 		// rounding suck, so this force readytostart() return true right after FIGHT! is printed
 		time_to_start = g_globalvars.time;
