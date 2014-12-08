@@ -4,9 +4,26 @@
 
 #include "g_local.h"
 
+#define MAX_TM_STATS (MAX_CLIENTS)
+
 static int round_num;
 static int team1_score;
 static int team2_score;
+
+char rndStats_names[MAX_TM_STATS][MAX_TEAM_NAME]; // u can't put this in struct in QVM
+
+typedef struct teamStats_s {
+    char *name; // team name
+    int gfrags; // frags from ghosts
+    int frags, deaths, tkills;
+    float dmg_t, dmg_g, dmg_team;
+    wpType_t wpn[wpMAX];
+    itType_t itm[itMAX];
+} teamStats_t;
+
+teamStats_t rndStats[MAX_TM_STATS];
+
+int rndStats_cnt = 0;
 
 qbool is_rules_change_allowed( void );
 
@@ -97,6 +114,22 @@ void ToggleCArena()
 	apply_CA_settings();
 }
 
+void CA_reset_round_stats(void)
+{
+    int i;
+
+    rndStats_cnt = 0;
+    memset(rndStats, 0, sizeof(rndStats));
+    memset(rndStats_names, 0, sizeof(rndStats_names));
+
+    for ( i = 0; i < MAX_TM_STATS; i++ )
+        rndStats[i].name = rndStats_names[i];
+}
+
+void CA_print_round_stats(void)
+{
+}
+
 void CA_change_pov(void)
 {
     gedict_t *p;
@@ -153,6 +186,7 @@ void CA_PutClientInServer(void)
 		self->s.v.armorvalue   = 200;
 		self->s.v.armortype    = 0.8;
 		self->s.v.health       = 150;
+        self->ca_grenades      = 10;
 
 		items = 0;
 		items |= IT_AXE;
@@ -329,7 +363,6 @@ void CA_StoreTeams(void)
     gedict_t *p;
     for( p = world; (p = find_plr( p )); )
     {
-        p->ca_oldteam = getteam(p);
         stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo oldteam \"%s\"\n", getteam(p));
     }
 }
@@ -428,6 +461,8 @@ void CA_Frame(void)
 				{
                     G_cp2all("%s \x90%s\x91 wins round %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),round_num);
                     G_bprint(2, "%s \x90%s\x91 wins round %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),round_num);
+
+                    CA_print_round_stats();
 
 					if ( alive_team == 1 )
 					{
@@ -547,6 +582,8 @@ void CA_Frame(void)
 
 		if ( r < 9 )
 		{
+            CA_reset_round_stats();
+
 			G_cp2all("Round %d of %d\n\n%s: %d\n\n"
 				"\x90%s\x91:%s \x90%s\x91:%s",
 				round_num, CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required

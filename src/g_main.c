@@ -229,7 +229,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 			bloodfest_client_think();
 		}
 
-        if ( isTeam() && cvar("k_clan_arena") )
+        if ( isCA() )
         {
             extern void CA_client_think(void);
             CA_client_think();

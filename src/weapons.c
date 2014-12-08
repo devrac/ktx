@@ -1199,12 +1199,10 @@ void W_FireGrenade()
     if ( match_in_progress == 2 )
 		if ( deathmatch != 4 && !k_bloodfest )
 		{
-			if( isCA() && self->s.v.ammo_rockets >= 2 )
-			{
-				self->s.v.currentammo = self->s.v.ammo_rockets = self->s.v.ammo_rockets - 2;
+			if( isCA() ) {
+                self->s.v.currentammo = self->ca_grenades = self->ca_grenades - 1;
 			}
-			else
-			{
+			else {
 				self->s.v.currentammo = self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
 			}
 		}
@@ -1590,7 +1588,12 @@ void W_SetCurrentAmmo()
 		break;
 
 	case IT_GRENADE_LAUNCHER:
-		self->s.v.currentammo = self->s.v.ammo_rockets;
+        if (isCA()) {
+	    	self->s.v.currentammo = self->s.v.ammo_rockets;
+        }
+        else {
+            self->s.v.currentammo = self->ca_grenades;
+        }
 		self->s.v.weaponmodel = "progs/v_rock.mdl";
 		self->s.v.weaponframe = 0;
 		items |= IT_ROCKETS;
@@ -1872,7 +1875,7 @@ qbool W_CanSwitch( int wp, qbool warn )
 		break;
 	case 6:
 		fl = IT_GRENADE_LAUNCHER;
-		if ( self->s.v.ammo_rockets < 1 )
+		if ( (isCA() && self->ca_grenades < 1) || (!isCA() && self->s.v.ammo_rockets < 1) )
 			am = 1;
 		break;
 	case 7:
@@ -1958,7 +1961,7 @@ qbool W_ChangeWeapon( int wp )
 		break;
 	case 6:
 		fl = IT_GRENADE_LAUNCHER;
-		if ( self->s.v.ammo_rockets < 1 )
+        if ( (isCA() && self->ca_grenades < 1) || (!isCA() && self->s.v.ammo_rockets < 1) )
 			am = 1;
 		break;
 	case 7:
@@ -2057,7 +2060,7 @@ qbool CycleWeaponCommand()
 
 		case IT_SUPER_NAILGUN:
 			self->s.v.weapon = IT_GRENADE_LAUNCHER;
-			if ( self->s.v.ammo_rockets < 1 )
+            if ( (isCA() && self->ca_grenades < 1) || (!isCA() && self->s.v.ammo_rockets < 1) )
 				am = 1;
 			break;
 
@@ -2114,7 +2117,7 @@ qbool CycleWeaponReverseCommand()
 
 		case IT_ROCKET_LAUNCHER:
 			self->s.v.weapon = IT_GRENADE_LAUNCHER;
-			if ( self->s.v.ammo_rockets < 1 )
+            if ( (isCA() && self->ca_grenades < 1) || (!isCA() && self->s.v.ammo_rockets < 1) )
 				am = 1;
 			break;
 
