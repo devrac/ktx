@@ -540,6 +540,7 @@ typedef struct gedict_s {
 
 // { Clan Arena
 	qbool ca_alive;
+    char ca_oldteam[64];
     int ca_grenades;
 // }
 

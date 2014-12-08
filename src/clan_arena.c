@@ -112,7 +112,7 @@ void CA_print_round_stats(void)
     */
 
     // Just show the normal cumulative player stats for now
-    PlayersStats ();
+    // PlayersStats ();
 }
 
 void CA_change_pov(void)
@@ -126,14 +126,13 @@ void CA_change_pov(void)
 
     for( ; (p = find_plr( p )); )
     {
-        if ( ISLIVE( p ) && streq(ezinfokey(self,"oldteam"),ezinfokey(p,"oldteam")) ) {
-            break; // we found alive player!
+        if ( ISLIVE( p ) && streq(self->ca_oldteam,p->ca_oldteam ) ) {
+            self->trackent = NUM_FOR_EDICT( p ? p : world );
+            if ( p ) {
+                G_sprint( self, 2, "tracking %s\n", getname( p )) ;
+            }
         }
     }
-
-    self->trackent = NUM_FOR_EDICT( p ? p : world );
-    if ( p )
-        G_sprint( self, 2, "tracking %s\n", getname( p )) ;
 }
 
 void CA_dead_jump_button( void )
@@ -205,8 +204,8 @@ void CA_PutClientInServer(void)
         self->s.v.movetype     = MOVETYPE_WALK;
 		self->vw_index		 = 0;
 		setmodel( self, "" );
-        self->s.v.armorvalue   = 666;
-        self->s.v.health       = 666;
+        self->s.v.armorvalue   = 0;
+        self->s.v.health       = 0;
 
 		setorigin (self, PASSVEC3( self->s.v.origin ) );
 	}
@@ -314,7 +313,7 @@ void CA_TeamsStats(void)
 {
 	if (team1_score != team2_score)
 	{
-		G_bprint( 2, "%s \x90%s\x91 wins %d to %d\n", redtext("Team"),
+		G_bprint( 2, "Team \x90%s\x91 wins %d to %d\n",
 			cvar_string(va("_k_team%d", team1_score > team2_score ? 1 : 2)),
 			team1_score > team2_score ? team1_score : team2_score,
 			team1_score > team2_score ? team2_score : team1_score);
@@ -337,8 +336,8 @@ void CA_SetDeadTeams(void)
     for( p = world; (p = find_plr( p )); )
     {
         if( ISDEAD(p) && strneq(getteam(p),deadteam) ) {
-            stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo oldteam \"%s\"\n", getteam(p));
-            stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo team \"%s\"\n", deadteam);
+            strcpy(p->ca_oldteam,getteam(p));
+            stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "team \"%s\"\n", deadteam);
         }
     }
 }
@@ -348,7 +347,7 @@ void CA_StoreTeams(void)
     gedict_t *p;
     for( p = world; (p = find_plr( p )); )
     {
-        stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo oldteam \"%s\"\n", getteam(p));
+        strcpy(p->ca_oldteam,getteam(p));
     }
 }
 
@@ -357,7 +356,7 @@ void CA_RestoreTeams(void)
     gedict_t *p;
     for( p = world; (p = find_plr( p )); )
     {
-        stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "setinfo team \"%s\"\n", ezinfokey(p,"oldteam"));
+        stuffcmd_flags(p, STUFFCMD_IGNOREINDEMO, "team \"%s\"\n", p->ca_oldteam);
     }
 }
 
@@ -385,8 +384,9 @@ void CA_client_think(void)
         return;
 
     // if player dead, then allow speccing alive players with jump button.
-    if ( !ISLIVE( self ) )
+    if ( !ISLIVE( self ) ) {
         CA_dead_jump_button();
+    }
 }
 
 void CA_Frame(void)
@@ -422,7 +422,9 @@ void CA_Frame(void)
         if(CA_check_alive_teams( &alive_team ) <= 1 )
         {
 		    time_to_end = g_globalvars.time + 3;
+
             CA_RestoreTeams();
+
     		ra_match_fight = 3;
     		return;
         }
@@ -462,12 +464,15 @@ void CA_Frame(void)
 				}
 			default: break; // both teams alive
 		}
+
         ra_match_fight = 4;
+        return;
 	}
 
     if ( ra_match_fight == 4 && Q_rint( time_to_end - g_globalvars.time ) <= -3)
     {
         ra_match_fight = 0;
+        return;
     }
 
 	if ( team1_score >= CA_wins_required() || team2_score >= CA_wins_required() )
@@ -481,7 +486,6 @@ void CA_Frame(void)
 		// ok start ra timer
 		ra_match_fight = 1; // ra countdown
 		last_r = 999999999;
-        CA_StoreTeams();
 
 		time_to_start  = g_globalvars.time + 9;
 
@@ -536,10 +540,12 @@ void CA_Frame(void)
 	{
         CA_reset_round_stats();
 
+        CA_StoreTeams();
+
 		char *fight = redtext("FIGHT!");
 
 		sound (world, CHAN_AUTO + CHAN_NO_PHS_ADD, "ca/sffight.wav", 1, ATTN_NONE);
-		G_cp2all("%s", fight);
+		G_cp2all("%s\n\n\n\n", fight);
 
 		ra_match_fight = 2;
 

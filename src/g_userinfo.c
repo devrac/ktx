@@ -281,7 +281,9 @@ qbool FixPlayerTeam ( char *newteam )
 		return false;
 
     if ( isCA() ) {
-        return false;
+        if ( streq(newteam,self->ca_oldteam) || streq(newteam,redtext("dead")) ) {
+            return false;
+        }
     }
 
 	// do not allow change team in game / countdown

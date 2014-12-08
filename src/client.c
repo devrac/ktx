@@ -3157,14 +3157,15 @@ void PlayerPostThink()
                     self->brokenankle = 1;  // Yes we have just broken it
             }
 
-            if( isCA() ) {
+            /* Commented out no CA fall damage */
+            /*if( isCA() ) {
                 sound( self, CHAN_VOICE, "player/land.wav", 1, ATTN_NORM );
             }
-            else {
+            else {*/
                 self->deathtype = dtFALL;
                 T_Damage( self, world, world, 5 );
                 sound( self, CHAN_VOICE, "player/land2.wav", 1, ATTN_NORM );
-            }
+            /*}*/
 
             if ( gre && gre->s.v.takedamage == DAMAGE_AIM && gre != self )
             {
