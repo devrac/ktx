@@ -105,7 +105,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
     int api_ver;
 
 	ClearGlobals();
-	
+
 	switch ( command )
 	{
 	case GAME_INIT:
@@ -168,7 +168,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 			cmdinfo_infoset ( self );
 
 		update_ghosts();
-		
+
 		return 1;
 
 	case GAME_PUT_CLIENT_IN_SERVER:
@@ -228,6 +228,12 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 			extern void bloodfest_client_think(void);
 			bloodfest_client_think();
 		}
+
+        if ( isTeam() && cvar("k_clan_arena") )
+        {
+            extern void CA_client_think(void);
+            CA_client_think();
+        }
 
 		if ( !arg0 )
 			PlayerPreThink();
@@ -423,7 +429,7 @@ void G_ShutDown()
 
 //===========================================================================
 // Physics
-// 
+//
 //===========================================================================
 ////////////////
 // GlobalParams:

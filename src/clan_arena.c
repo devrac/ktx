@@ -97,6 +97,44 @@ void ToggleCArena()
 	apply_CA_settings();
 }
 
+void CA_change_pov(void)
+{
+    gedict_t *p;
+
+    if ( self->trackent > 0 && self->trackent <= MAX_CLIENTS )
+        p = &g_edicts[ self->trackent ];
+    else
+        p = world;
+
+    for( ; (p = find_plr( p )); )
+    {
+        if ( ISLIVE( p ) && streq(ezinfokey(self,"oldteam"),ezinfokey(p,"oldteam")) ) {
+            break; // we found alive player!
+        }
+    }
+
+    self->trackent = NUM_FOR_EDICT( p ? p : world );
+    if ( p )
+        G_sprint( self, 2, "tracking %s\n", getname( p )) ;
+}
+
+void CA_dead_jump_button( void )
+{
+    if ( !self->s.v.button2 )
+    {
+        self->s.v.flags = ( ( int ) ( self->s.v.flags ) ) | FL_JUMPRELEASED;
+        return;
+    }
+
+    if ( !( ( ( int ) ( self->s.v.flags ) ) & FL_JUMPRELEASED ) )
+        return;
+
+    self->s.v.flags = (int)self->s.v.flags & ~FL_JUMPRELEASED;
+
+    // switch pov.
+    CA_change_pov();
+}
+
 void CA_PutClientInServer(void)
 {
 	if ( !isCA() )
@@ -240,17 +278,6 @@ void CA_damage_live_players( int dodamage )
 	}
 }
 
-void CA_print_winners_health(void)
-{
-    gedict_t *p;
-    for( p = world; (p = find_plr( p )); )
-    {
-        if ( ISLIVE( p ) ) {
-            G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n", p->s.v.netname, Q_rint(p->s.v.armorvalue), Q_rint(p->s.v.health));
-        }
-    }
-}
-
 void CA_PrintScores(void)
 {
 	int s1 = team1_score;
@@ -316,6 +343,34 @@ void CA_RestoreTeams(void)
     }
 }
 
+// called each time something/someone is killed.
+void CA_killed_hook( gedict_t * killed, gedict_t * attacker )
+{
+    int alive = 0;
+
+    if ( match_in_progress != 2 )
+        return;
+
+    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2) {
+        G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n",
+            attacker->s.v.netname,
+            Q_rint(attacker->s.v.armorvalue),
+            Q_rint(attacker->s.v.health));
+    }
+
+}
+
+// CA Client Hook
+void CA_client_think(void)
+{
+    if ( self->ct != ctPlayer )
+        return;
+
+    // if player dead, then allow speccing alive players with jump button.
+    if ( !ISLIVE( self ) )
+        CA_dead_jump_button();
+}
+
 void CA_Frame(void)
 {
 	/*
@@ -342,6 +397,7 @@ void CA_Frame(void)
 	if ( match_in_progress != 2 )
 		return;
 
+
 	// check if there exist only one team with alive players and others are eliminated, if so then its time to start end timer
 	if ( ra_match_fight == 2 )
     {
@@ -365,14 +421,13 @@ void CA_Frame(void)
 			case 0: // DRAW, both teams are dead
 				{
 					sound (world, CHAN_AUTO + CHAN_NO_PHS_ADD, "ca/sfdraw.wav", 1, ATTN_NONE);
-					G_cp2all("%s", redtext("DRAW!"));
+                    G_cp2all("Round %d was a %s", round_num, redtext("draw"));
 					break;
 				}
 			case 1: // Only one team alive
 				{
-                    G_cp2all("%s \x90%s\x91 wins round\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)));
-					G_bprint(2, "%s \x90%s\x91 wins round\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)));
-                    CA_print_winners_health();
+                    G_cp2all("%s \x90%s\x91 wins round %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),round_num);
+                    G_bprint(2, "%s \x90%s\x91 wins round %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),round_num);
 
 					if ( alive_team == 1 )
 					{
