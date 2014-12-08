@@ -10,21 +10,6 @@ static int round_num;
 static int team1_score;
 static int team2_score;
 
-char rndStats_names[MAX_TM_STATS][MAX_TEAM_NAME]; // u can't put this in struct in QVM
-
-typedef struct teamStats_s {
-    char *name; // team name
-    int gfrags; // frags from ghosts
-    int frags, deaths, tkills;
-    float dmg_t, dmg_g, dmg_team;
-    wpType_t wpn[wpMAX];
-    itType_t itm[itMAX];
-} teamStats_t;
-
-teamStats_t rndStats[MAX_TM_STATS];
-
-int rndStats_cnt = 0;
-
 qbool is_rules_change_allowed( void );
 
 void SM_PrepareCA(void)
@@ -116,18 +101,18 @@ void ToggleCArena()
 
 void CA_reset_round_stats(void)
 {
-    int i;
-
-    rndStats_cnt = 0;
-    memset(rndStats, 0, sizeof(rndStats));
-    memset(rndStats_names, 0, sizeof(rndStats_names));
-
-    for ( i = 0; i < MAX_TM_STATS; i++ )
-        rndStats[i].name = rndStats_names[i];
+    // Somthing might go here later..
 }
 
 void CA_print_round_stats(void)
 {
+    /*
+    G_bprint (PRINT_MEDIUM, "score damg kills rl  rd  lg%% player\n" );
+    G_bprint (PRINT_MEDIUM, "----- ---- ----- --- --- --- ---------------\n" );
+    */
+
+    // Just show the normal cumulative player stats for now
+    PlayersStats ();
 }
 
 void CA_change_pov(void)
@@ -549,6 +534,8 @@ void CA_Frame(void)
 
 	if ( r <= 0 )
 	{
+        CA_reset_round_stats();
+
 		char *fight = redtext("FIGHT!");
 
 		sound (world, CHAN_AUTO + CHAN_NO_PHS_ADD, "ca/sffight.wav", 1, ATTN_NONE);
@@ -582,8 +569,6 @@ void CA_Frame(void)
 
 		if ( r < 9 )
 		{
-            CA_reset_round_stats();
-
 			G_cp2all("Round %d of %d\n\n%s: %d\n\n"
 				"\x90%s\x91:%s \x90%s\x91:%s",
 				round_num, CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
