@@ -109,9 +109,6 @@ typedef struct player_stats_s {
 	float    dmg_g; // damage given
 	float    dmg_g_rl; // virtual given rl damage
 	float    dmg_team;  // damage to team
-// { k_dmgfrags
-	float    dmg_frags; // frags awarded from damage (CA)
-// }
 
 	int		ot_a;	 // overtime armor value
 //	float	ot_at;   // overtime armor type
@@ -156,6 +153,19 @@ typedef struct player_stats_s {
 	// rocket arena
 	int wins;	//number of wins they have
 	int loses;	//number of loses they have
+
+    // Clan Arena
+    float   dmg_frags;          // frags awarded from damage
+
+    // Clan Arena Pre-Round stats
+    float   ca_prernd_dmg_g;    // damage given
+    float   ca_prernd_dmg_g_rl; // RL damage given
+    int     ca_prernd_frags;    // frags
+    int     ca_prernd_rla;      // RL attacks
+    int     ca_prernd_rlh;      // RL real hits
+    int     ca_prernd_rlv;      // RL virtual hits
+    int     ca_prernd_lga;      // LG attacks
+    int     ca_prernd_lgh;      // LG real hits
 
 	// velocity stats
 	float velocity_max;	// maximum velocity

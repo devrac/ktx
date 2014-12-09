@@ -101,18 +101,43 @@ void ToggleCArena()
 
 void CA_reset_round_stats(void)
 {
-    // Somthing might go here later..
+    int from1 = 0;
+    gedict_t *p;
+
+    for( p = world; (p = find_plrghst( p, &from1 )); )
+    {
+        p->ps.ca_prernd_dmg_g       =   p->ps.dmg_g;                // damage given
+        p->ps.ca_prernd_dmg_g_rl    =   p->ps.dmg_g_rl;             // RL damage given
+        p->ps.ca_prernd_frags       =   p->s.v.frags ;              // frags
+        p->ps.ca_prernd_rla         =   p->ps.wpn[wpRL].attacks;    // RL attacks
+        p->ps.ca_prernd_rlh         =   p->ps.wpn[wpRL].hits;       // RL real hits
+        p->ps.ca_prernd_rlv         =   p->ps.wpn[wpRL].rhits;      // RL virtual hits
+        p->ps.ca_prernd_lga         =   p->ps.wpn[wpLG].attacks;    // LG attacks
+        p->ps.ca_prernd_lgh         =   p->ps.wpn[wpLG].hits;       // LG real hits
+    }
 }
 
 void CA_print_round_stats(void)
 {
-    /*
-    G_bprint (PRINT_MEDIUM, "score damg kills rl  rd  lg%% player\n" );
-    G_bprint (PRINT_MEDIUM, "----- ---- ----- --- --- --- ---------------\n" );
-    */
+    int from1 = 0;
+    gedict_t *p;
 
-    // Just show the normal cumulative player stats for now
-    // PlayersStats ();
+    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%%\n" );
+    G_bprint (PRINT_MEDIUM, "---------- -----  --- -- -- -----  --- --- ------\n" );
+
+    for( p = world; (p = find_plrghst( p, &from1 )); )
+    {
+        float dmg = p->ps.dmg_g - p->ps.ca_prernd_dmg_g;
+        float drl = p->ps.dmg_g_rl - p->ps.ca_prernd_dmg_g_rl;
+        float frg = p->s.v.frags - p->ps.ca_prernd_frags;
+        int rla = p->ps.wpn[wpRL].attacks - p->ps.ca_prernd_rla;
+        int rlh = p->ps.wpn[wpRL].hits - p->ps.ca_prernd_rlh;
+        int rlv = p->ps.wpn[wpRL].rhits - p->ps.ca_prernd_rlv;
+        int lga = p->ps.wpn[wpLG].attacks - p->ps.ca_prernd_lga;
+        int lgh = p->ps.wpn[wpLG].hits - p->ps.ca_prernd_lgh;
+
+        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%%\n",p->s.v.netname,frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga));
+    }
 }
 
 void CA_change_pov(void)
