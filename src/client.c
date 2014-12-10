@@ -3627,7 +3627,9 @@ void ClientObituary (gedict_t *targ, gedict_t *attacker)
             }
             else
             {
-                targ->s.v.frags -= (dtSUICIDE == targ->deathtype ? 2 : 1);
+                if ( !isCA() ) {
+                    targ->s.v.frags -= (dtSUICIDE == targ->deathtype ? 2 : 1);
+                }
             }
 
             logfrag (targ, targ);
@@ -3913,7 +3915,9 @@ void ClientObituary (gedict_t *targ, gedict_t *attacker)
         }
         else
         {
-            targ->s.v.frags -= 1;            // killed self
+            if ( !isCA() ) {
+                targ->s.v.frags -= 1;            // killed self
+            }
         }
 
         logfrag (targ, targ);

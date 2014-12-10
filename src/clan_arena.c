@@ -89,7 +89,7 @@ void ToggleCArena()
 		// seems we trying turn CA on.
 		if ( !isTeam() )
 		{
-			G_sprint(self, 2, "Set %s mode first\n", redtext("team"));
+            G_sprint(self, 2, "Set 4on4 or 10on10 mode first\n");
 			return;
 		}
 	}
@@ -123,7 +123,7 @@ void CA_print_round_stats(void)
     gedict_t *p;
 
     G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%%\n" );
-    G_bprint (PRINT_MEDIUM, "---------- -----  --- -- -- -----  --- --- ------\n" );
+    G_bprint (PRINT_MEDIUM, "%s\n", redtext("---------- -----  --- -- -- -----  --- --- ------"));
 
     for( p = world; (p = find_plrghst( p, &from1 )); )
     {
@@ -244,7 +244,7 @@ qbool CA_can_fire( gedict_t *p )
 	if ( !isCA() )
 		return true;
 
-	return ( ISLIVE( p ) && ra_match_fight == 2 && time_to_start && g_globalvars.time >= time_to_start );
+    return ( (ISLIVE( p ) && ra_match_fight == 2 && time_to_start && g_globalvars.time >= time_to_start) || !match_in_progress);
 }
 
 // return 0 if there no alive teams
@@ -494,7 +494,7 @@ void CA_Frame(void)
         return;
 	}
 
-    if ( ra_match_fight == 4 && Q_rint( time_to_end - g_globalvars.time ) <= -3)
+    if ( ra_match_fight == 4 && Q_rint( time_to_end - g_globalvars.time ) <= -5)
     {
         ra_match_fight = 0;
         return;
