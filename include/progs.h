@@ -202,7 +202,8 @@ typedef struct vote_s {
 	int pickup;
 	int rpickup;
 	int nospecs;
-	int coop;
+    int coop;
+    int carena;
 	int antilag;
 
 	electType_t elect_type; // election type

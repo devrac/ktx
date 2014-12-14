@@ -43,7 +43,7 @@ void AbortElect()
 	vote_clear( OV_ELECT ); // clear vote
 
 // Kill timeout checker entity
-	for( p = world; (p = find(p, FOFCLSN, "electguard")); ) 
+	for( p = world; (p = find(p, FOFCLSN, "electguard")); )
 		ent_remove( p );
 }
 
@@ -170,6 +170,7 @@ int get_votes_req( int fofs, qbool diff )
 
 		case OV_NOSPECS: percent = cvar("k_vp_nospecs"); break;
 		case OV_COOP:    percent = cvar("k_vp_coop"); break;
+        case OV_CA:      percent = cvar("k_vp_ca"); break;
 		case OV_ANTILAG: percent = cvar("k_vp_antilag"); break;
 	}
 
@@ -189,6 +190,8 @@ int get_votes_req( int fofs, qbool diff )
 		vt_req = max(2, vt_req); // at least 2 votes in this case
 	else if ( fofs == OV_COOP )
 		vt_req = max(1, vt_req); // at least 1 votes in this case
+    else if ( fofs == OV_CA )
+        vt_req = max(1, vt_req); // at least 1 votes in this case
 	else if ( fofs == OV_ANTILAG )
 		vt_req = max(2, vt_req); // at least 2 votes in this case
 
@@ -528,10 +531,10 @@ void vote_check_nospecs ()
 			{
 				if ( VIP( spec ) & ALLOWED_NOSPECS_VIPS )
 					continue; // don't kick this VIP
-    
+
 				if ( is_real_adm(spec) )
 					continue; // don't kick real admin
-    
+
 				stuffcmd(spec, "disconnect\n");  // FIXME: stupid way
 			}
 		}
@@ -543,7 +546,7 @@ void vote_check_nospecs ()
 void nospecs( )
 {
     int votes;
-	
+
 	if ( match_in_progress )
 	{
         G_sprint(self, 2, "%s mode %s\n", redtext("No spectators"), OnOff(cvar("_k_nospecs")));
@@ -563,8 +566,8 @@ void nospecs( )
 
 	self->v.nospecs = !self->v.nospecs;
 
-	G_bprint(2, "%s %s!%s\n", self->s.v.netname, 
-			(self->v.nospecs ? redtext(va("votes for nospecs %s", OnOff(!cvar("_k_nospecs")))) : 
+	G_bprint(2, "%s %s!%s\n", self->s.v.netname,
+			(self->v.nospecs ? redtext(va("votes for nospecs %s", OnOff(!cvar("_k_nospecs")))) :
 							   redtext(va("withdraws %s nospecs vote", g_his(self)))),
 			((votes = get_votes_req( OV_NOSPECS, true )) ? va(" (%d)", votes) : ""));
 
@@ -605,7 +608,7 @@ void vote_check_coop ()
 			changelevel( coop ? g_globalvars.mapname : cvar_string( "k_defmap" ) );
 		else
 			changelevel( coop ? "start" : g_globalvars.mapname );
-			
+
 		return;
 	}
 }
@@ -622,12 +625,73 @@ void votecoop( )
 
 	self->v.coop = !self->v.coop;
 
-	G_bprint(2, "%s %s!%s\n", self->s.v.netname, 
-			(self->v.coop ? redtext(va("votes for coop %s", OnOff(!cvar("coop")))) : 
+	G_bprint(2, "%s %s!%s\n", self->s.v.netname,
+			(self->v.coop ? redtext(va("votes for coop %s", OnOff(!cvar("coop")))) :
 							redtext(va("withdraws %s coop vote", g_his(self)))),
 			((votes = get_votes_req( OV_COOP, true )) ? va(" (%d)", votes) : ""));
 
 	vote_check_coop ();
+}
+
+// }
+
+// { voteca
+void vote_check_ca ()
+{
+    int veto;
+
+    if ( ( deathmatch && match_in_progress ) || intermission_running || match_over )
+        return;
+
+    if ( !get_votes( OV_CA ) )
+        return;
+
+    veto = is_admins_vote( OV_CA );
+
+    if( veto || !get_votes_req( OV_CA, true ) )
+    {
+        vote_clear( OV_CA );
+
+        // toggle clan arena mode
+        cvar_fset( "k_clan_arena", !cvar("k_clan_arena") );
+
+        if ( veto )
+            G_bprint( 2, "%s\n", redtext(va("Clan arena mode %s by admin veto", OnOff(cvar("k_clan_arena")))) );
+        else
+            G_bprint( 2, "%s\n", redtext(va("Clan arena mode %s by majority vote", OnOff(cvar("k_clan_arena")))) );
+
+        if( cvar("k_clan_arena") ) {
+            changelevel( g_globalvars.mapname );
+            apply_CA_settings();
+        }
+
+        return;
+    }
+}
+
+void voteca( )
+{
+    int votes;
+
+    if ( !isTeam() ) {
+        G_sprint(self, 2, "Please set team mode first\n");
+        return;
+    }
+
+    if ( deathmatch && match_in_progress )
+    {
+        G_sprint(self, 2, "Match in progress and deathmatch is non zero, you can't vote for clan arena\n");
+        return;
+    }
+
+    self->v.carena = !self->v.carena;
+
+    G_bprint(2, "%s %s!%s\n", self->s.v.netname,
+            (self->v.carena ? redtext(va("votes for clan arena %s", OnOff(!cvar("k_clan_arena")))) :
+                              redtext(va("withdraws %s clan arena vote", g_his(self)))),
+            ((votes = get_votes_req( OV_CA, true )) ? va(" (%d)", votes) : ""));
+
+    vote_check_ca ();
 }
 
 // }
@@ -665,7 +729,7 @@ void vote_check_antilag ()
 void antilag( )
 {
     int votes;
-	
+
 	if ( match_in_progress )
 	{
         G_sprint(self, 2, "%s mode %s\n", redtext("Antilag"), OnOff(2 == cvar("sv_antilag")));
@@ -685,8 +749,8 @@ void antilag( )
 
 	self->v.antilag = !self->v.antilag;
 
-	G_bprint(2, "%s %s!%s\n", self->s.v.netname, 
-			(self->v.antilag ? redtext(va("votes for antilag %s", OnOff(!(2 == cvar("sv_antilag"))))) : 
+	G_bprint(2, "%s %s!%s\n", self->s.v.netname,
+			(self->v.antilag ? redtext(va("votes for antilag %s", OnOff(!(2 == cvar("sv_antilag"))))) :
 							   redtext(va("withdraws %s antilag vote", g_his(self)))),
 			((votes = get_votes_req( OV_ANTILAG, true )) ? va(" (%d)", votes) : ""));
 

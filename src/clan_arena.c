@@ -40,17 +40,23 @@ qbool isCA( )
 
 // hard coded default settings for CA
 static char ca_settings[] =
+    "coop 0\n"                  // no coop
+    "maxclients 8\n"            // 4on4 = 8 players
 	"k_clan_arena_rounds 9\n"
 	"dp 0\n"
 	"teamplay 4\n"
 	"deathmatch 5\n"
+    "k_pow 1\n"                 // use powerups
 	"timelimit 30\n"
 	"k_overtime 0\n"
 	"k_spw 1\n"
 	"k_dmgfrags 1\n"
 	"k_noitems 1\n"
 	"k_exclusive 0\n"
-	"k_membercount 1\n";
+	"k_membercount 1\n"
+    "k_lockmin 1\n"             //
+    "k_lockmax 2\n"             //
+    "k_mode 2\n";               //
 
 void apply_CA_settings(void)
 {
@@ -80,25 +86,6 @@ void apply_CA_settings(void)
 	G_cprint("\n");
 }
 
-void ToggleCArena()
-{
-	if ( !is_rules_change_allowed() )
-		return;
-
-	if ( !isCA() ) {
-		// seems we trying turn CA on.
-		if ( !isTeam() )
-		{
-            G_sprint(self, 2, "Set 4on4 or 10on10 mode first\n");
-			return;
-		}
-	}
-
-	cvar_toggle_msg( self, "k_clan_arena", redtext("Clan Arena") );
-
-	apply_CA_settings();
-}
-
 void CA_reset_round_stats(void)
 {
     int from1 = 0;
@@ -122,7 +109,7 @@ void CA_print_round_stats(void)
     int from1 = 0;
     gedict_t *p;
 
-    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%s\n", redtext("%%") );
+    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%s\n", redtext("%") );
     G_bprint (PRINT_MEDIUM, "%s\n", redtext("---------- -----  --- -- -- -----  --- --- ------"));
 
     for( p = world; (p = find_plrghst( p, &from1 )); )
@@ -136,7 +123,7 @@ void CA_print_round_stats(void)
         int lga = p->ps.wpn[wpLG].attacks - p->ps.ca_prernd_lga;
         int lgh = p->ps.wpn[wpLG].hits - p->ps.ca_prernd_lgh;
 
-        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%%\n",getname(p),frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga));
+        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%s\n",getname(p),frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga), redtext("%"));
     }
 }
 
@@ -600,9 +587,10 @@ void CA_Frame(void)
 
 		if ( r < 9 )
 		{
-			G_cp2all("Round %d of %d\n\n%s: %d\n\n"
+			G_cp2all("%s %d %s %d\n\n%s: %d\n\n"
 				"\x90%s\x91:%s \x90%s\x91:%s",
-				round_num, CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
+				redtext("Round"),round_num, redtext("of"), CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"),
+                dig3(team1_score), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
 		}
 	}
 }

@@ -408,18 +408,21 @@ void SP_worldspawn()
 	trap_precache_sound( "zombie/z_miss.wav" );
 
 // CA Sounds
-	trap_precache_sound( "ca/sfround.wav" );
-	trap_precache_sound( "ca/sffight.wav" );
-	trap_precache_sound( "ca/sfdraw.wav" );
-	trap_precache_sound( "ca/sf9.wav" );
-	trap_precache_sound( "ca/sf8.wav" );
-	trap_precache_sound( "ca/sf7.wav" );
-	trap_precache_sound( "ca/sf6.wav" );
-	trap_precache_sound( "ca/sf5.wav" );
-	trap_precache_sound( "ca/sf4.wav" );
-	trap_precache_sound( "ca/sf3.wav" );
-	trap_precache_sound( "ca/sf2.wav" );
-	trap_precache_sound( "ca/sf1.wav" );
+    if ( isCA() )
+    {
+        trap_precache_sound( "ca/sfround.wav" );
+        trap_precache_sound( "ca/sffight.wav" );
+        trap_precache_sound( "ca/sfdraw.wav" );
+        trap_precache_sound( "ca/sf9.wav" );
+        trap_precache_sound( "ca/sf8.wav" );
+        trap_precache_sound( "ca/sf7.wav" );
+        trap_precache_sound( "ca/sf6.wav" );
+        trap_precache_sound( "ca/sf5.wav" );
+        trap_precache_sound( "ca/sf4.wav" );
+        trap_precache_sound( "ca/sf3.wav" );
+        trap_precache_sound( "ca/sf2.wav" );
+	    trap_precache_sound( "ca/sf1.wav" );
+    }
 
 // g_models required for yawnmode weapondrops
 	trap_precache_model( "progs/g_shot.mdl" );
@@ -702,6 +705,7 @@ void FirstFrame	( )
 	RegisterCvar("k_vp_rpickup"); // votes percentage for rpickup voting
 	RegisterCvar("k_vp_nospecs"); // votes percentage for nospecs voting
 	RegisterCvar("k_vp_coop");    // votes percentage for coop voting
+    RegisterCvar("k_vp_ca");      // votes percentage for clan arena voting
 	RegisterCvar("k_vp_antilag"); // votes percentage for antilag voting
 	RegisterCvar("k_no_vote_map"); // dis allow map voting in matcless mode, also disallow /next_map
 

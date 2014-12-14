@@ -97,7 +97,7 @@ extern globalvars_t g_globalvars;
 extern gedict_t *world;
 extern gedict_t *self, *other;
 extern gedict_t *newmis;
-extern int      timelimit, fraglimit, teamplay, deathmatch, framecount, coop, skill;
+extern int      timelimit, fraglimit, teamplay, deathmatch, framecount, coop, carena, skill;
 //extern float	rj;
 
 #define	EDICT_TO_PROG(e) ((byte *)(e) - (byte *)g_edicts)
@@ -689,6 +689,7 @@ void 	vote_check_all ();
 #define OV_MAP ( VOTE_FOFS ( map ) )
 #define OV_NOSPECS ( VOTE_FOFS ( nospecs ) )
 #define OV_COOP ( VOTE_FOFS ( coop ) )
+#define OV_CA ( VOTE_FOFS ( carena ) )
 #define OV_ANTILAG ( VOTE_FOFS ( antilag ) )
 
 void 	ElectThink();
