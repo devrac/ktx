@@ -122,7 +122,7 @@ void CA_print_round_stats(void)
     int from1 = 0;
     gedict_t *p;
 
-    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%%\n" );
+    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%s\n", redtext("%%") );
     G_bprint (PRINT_MEDIUM, "%s\n", redtext("---------- -----  --- -- -- -----  --- --- ------"));
 
     for( p = world; (p = find_plrghst( p, &from1 )); )
@@ -136,7 +136,7 @@ void CA_print_round_stats(void)
         int lga = p->ps.wpn[wpLG].attacks - p->ps.ca_prernd_lga;
         int lgh = p->ps.wpn[wpLG].hits - p->ps.ca_prernd_lgh;
 
-        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%%\n",p->s.v.netname,frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga));
+        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%%\n",getname(p),frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga));
     }
 }
 
@@ -309,7 +309,7 @@ void CA_damage_live_players( int dodamage )
 			p->s.v.health = p->s.v.health - dodamage;
 
 			if ( p->s.v.health <= 0 ) {
-				G_bprint (PRINT_MEDIUM, "%s ran out of health\n", p->s.v.netname);
+				G_bprint (PRINT_MEDIUM, "%s ran out of health\n", getname(p) );
 		                p->s.v.solid		 = SOLID_NOT;
 		                p->vw_index		 = 0;
 		                setmodel( p, "" );
@@ -395,7 +395,7 @@ void CA_killed_hook( gedict_t * killed, gedict_t * attacker )
 
     if ( killed != attacker && CA_check_alive_teams( &alive ) < 2) {
         G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n",
-            attacker->s.v.netname,
+            getname(attacker),
             Q_rint(attacker->s.v.armorvalue),
             Q_rint(attacker->s.v.health));
     }
