@@ -46,6 +46,7 @@ void VoteCaptain ();
 void nospecs();
 void votecoop();
 void voteca();
+void deprecated_carena();
 void RandomPickup();
 void ShowDMM();
 void ChangeDM(float dmm);
@@ -543,6 +544,7 @@ const char CD_NODESC[] = "no desc";
 #define CD_VOTECOOP     "vote for coop on/off"
 #define CD_COOPNMPU     "new nightmare mode (pu drops) on/off"
 #define CD_VOTECA       "vote for clan arena on/off"
+#define CD_CARENA       "Toggle clan arena (DEPRECATED)"
 
 #define CD_MAPSLIST_DL  (CD_NODESC) // skip
 #define CD_CMDSLIST_DL  (CD_NODESC) // skip
@@ -862,6 +864,7 @@ cmd_t cmds[] = {
 	{ "dumpent",     dumpent,                   0    , CF_BOTH | CF_PARAMS, CD_DUMPENT },
 	{ "votecoop",    votecoop,                  0    , CF_PLAYER | CF_MATCHLESS, CD_VOTECOOP },
     { "voteca",      voteca,                    0    , CF_PLAYER | CF_SPC_ADMIN, CD_VOTECA },
+    { "carena",      deprecated_carena,         0    , CF_PLAYER | CF_SPC_ADMIN, CD_CARENA },
 	{ "coop_nm_pu",	 ToggleNewCoopNm,           0    , CF_PLAYER | CF_MATCHLESS, CD_COOPNMPU },
 	{ "demomark",	 DemoMark,                  0    , CF_PLAYER, CD_DEMOMARK },
 };

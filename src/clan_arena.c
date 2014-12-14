@@ -588,9 +588,9 @@ void CA_Frame(void)
 		if ( r < 9 )
 		{
 			G_cp2all("%s %d %s %d\n\n%s: %d\n\n"
-				"\x90%s\x91:%s \x90%s\x91:%s",
+				"\x90%s\x91:%s %s \x90%s\x91:%s",
 				redtext("Round"),round_num, redtext("of"), CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"),
-                dig3(team1_score), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
+                dig3(team1_score), redtext("vs"), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
 		}
 	}
 }

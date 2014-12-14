@@ -669,6 +669,11 @@ void vote_check_ca ()
     }
 }
 
+void deprecated_carena( )
+{
+    G_sprint(self, 2, "This command has been replaced with %s\n",redtext("voteca"));
+}
+
 void voteca( )
 {
     int votes;
