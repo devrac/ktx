@@ -408,7 +408,6 @@ void SP_worldspawn()
 	trap_precache_sound( "zombie/z_miss.wav" );
 
 // CA Sounds
-	trap_precache_sound( "ca/sffinal.wav" );
 	trap_precache_sound( "ca/sfround.wav" );
 	trap_precache_sound( "ca/sffight.wav" );
 	trap_precache_sound( "ca/sfdraw.wav" );
