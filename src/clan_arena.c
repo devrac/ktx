@@ -49,7 +49,6 @@ static char ca_settings[] =
 	"k_spw 1\n"
 	"k_dmgfrags 1\n"
 	"k_noitems 1\n"
-	"k_exclusive 0\n"
 	"k_membercount 1\n";
 
 void apply_CA_settings(void)
@@ -393,7 +392,7 @@ void CA_killed_hook( gedict_t * killed, gedict_t * attacker )
     if ( match_in_progress != 2 )
         return;
 
-    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2) {
+    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2) && strneq(getname(attacker),"") {
         G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n",
             getname(attacker),
             Q_rint(attacker->s.v.armorvalue),
