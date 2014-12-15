@@ -471,8 +471,8 @@ void CA_Frame(void)
 				}
 			case 1: // Only one team alive
 				{
-                    G_cp2all("%s \x90%s\x91 wins round %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),round_num);
-                    G_bprint(2, "%s \x90%s\x91 wins round %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),round_num);
+                    G_cp2all("%s \x90%s\x91 %s %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),redtext("wins round"),round_num);
+                    G_bprint(2, "%s \x90%s\x91 %s %d\n", redtext("Team"), cvar_string(va("_k_team%d", alive_team)),redtext("wins round"),round_num);
 
                     CA_print_round_stats();
 
@@ -599,7 +599,7 @@ void CA_Frame(void)
 
 		if ( r < 9 )
 		{
-			G_cp2all("%s %d %s %d\n\n%s: %d\n\n"
+			G_cp2all("\n%s %d %s %d\n\n%s: %d\n\n"
 				"\x90%s\x91:%s %s \x90%s\x91:%s\n",
                 redtext("Round"), round_num, redtext("of"),
 				CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), redtext("vs"),
