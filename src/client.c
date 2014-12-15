@@ -1118,6 +1118,11 @@ qbool CanConnect()
             // kick if no ghost or player with team as for self
             t = getteam( self );
 
+            if( isCA() && streq(redtext("dead"),t) ) {
+                G_sprint(self, 2, "Cannot connect with %s team\n",redtext("dead"));
+                return false;
+            }
+
             for( from = 0, p = world; (p = find_plrghst( p, &from )); )
                 if ( p != self && streq( getteam( p ), t ) )
                     break;  // don't kick, find "player" or "ghost" with equal team

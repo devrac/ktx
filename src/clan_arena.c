@@ -88,7 +88,7 @@ void ToggleCArena()
 		// seems we trying turn CA on.
 		if ( !isTeam() )
 		{
-            G_sprint(self, 2, "Set 4on4 or 10on10 mode first\n");
+            G_sprint(self, 2, "Set teamplay mode first.\n");
 			return;
 		}
 	}
@@ -152,12 +152,12 @@ void CA_change_pov(void)
     for( ; (p = find_plr( p )); )
     {
         if ( ISLIVE( p ) && streq(self->ca_oldteam,p->ca_oldteam ) ) {
-            self->trackent = NUM_FOR_EDICT( p ? p : world );
-            if ( p ) {
-                G_sprint( self, 2, "tracking %s\n", getname( p )) ;
-            }
+            break;
         }
     }
+    self->trackent = NUM_FOR_EDICT( p ? p : world );
+    if ( p )
+        G_sprint( self, 2, "%s %s\n", redtext("tracking"), getname( p )) ;
 }
 
 void CA_dead_jump_button( void )
@@ -393,7 +393,7 @@ void CA_killed_hook( gedict_t * killed, gedict_t * attacker )
     if ( match_in_progress != 2 )
         return;
 
-    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2 && strneq(getname(attacker),"") ) {
+    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2 && strneq(getname(attacker),"") && (Q_rint(attacker->s.v.armorvalue) + Q_rint(attacker->s.v.health) > 0) ) {
         G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n",
             getname(attacker),
             Q_rint(attacker->s.v.armorvalue),
@@ -568,7 +568,7 @@ void CA_Frame(void)
 		char *fight = redtext("FIGHT!");
 
 		sound (world, CHAN_AUTO + CHAN_NO_PHS_ADD, "ca/sffight.wav", 1, ATTN_NONE);
-		G_cp2all("%s\n\n\n\n", fight);
+		G_cp2all("%s\n\n", fight);
 
 		ra_match_fight = 2;
 
@@ -600,7 +600,7 @@ void CA_Frame(void)
 		if ( r < 9 )
 		{
 			G_cp2all("%s %d %s %d\n\n%s: %d\n\n"
-				"\x90%s\x91:%s %s \x90%s\x91:%s",
+				"\x90%s\x91:%s %s \x90%s\x91:%s\n",
                 redtext("Round"), round_num, redtext("of"),
 				CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), redtext("vs"),
                 cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
