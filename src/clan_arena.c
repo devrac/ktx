@@ -392,7 +392,7 @@ void CA_killed_hook( gedict_t * killed, gedict_t * attacker )
     if ( match_in_progress != 2 )
         return;
 
-    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2) && strneq(getname(attacker),"") {
+    if ( killed != attacker && CA_check_alive_teams( &alive ) < 2 && strneq(getname(attacker),"") ) {
         G_bprint (PRINT_MEDIUM, "%s had %d armour, %d health\n",
             getname(attacker),
             Q_rint(attacker->s.v.armorvalue),
