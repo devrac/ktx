@@ -121,7 +121,7 @@ void CA_print_round_stats(void)
     int from1 = 0;
     gedict_t *p;
 
-    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%s\n", redtext("%%") );
+    G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%s\n", redtext("%") );
     G_bprint (PRINT_MEDIUM, "%s\n", redtext("---------- -----  --- -- -- -----  --- --- ------"));
 
     for( p = world; (p = find_plrghst( p, &from1 )); )
@@ -135,7 +135,8 @@ void CA_print_round_stats(void)
         int lga = p->ps.wpn[wpLG].attacks - p->ps.ca_prernd_lga;
         int lgh = p->ps.wpn[wpLG].hits - p->ps.ca_prernd_lgh;
 
-        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%%\n",getname(p),frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga));
+        G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%s\n",
+            getname(p),frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga), redtext("%"));
     }
 }
 
@@ -562,8 +563,6 @@ void CA_Frame(void)
 
 	if ( r <= 0 )
 	{
-        CA_reset_round_stats();
-
         CA_StoreTeams();
 
 		char *fight = redtext("FIGHT!");
@@ -585,6 +584,7 @@ void CA_Frame(void)
 		if ( r == 7 )
 		{
 			sound (world, CHAN_AUTO + CHAN_NO_PHS_ADD, va("ca/sfround.wav"), 1, ATTN_NONE);
+            CA_reset_round_stats();
 		}
 
 		if ( r == 6 )
@@ -599,9 +599,11 @@ void CA_Frame(void)
 
 		if ( r < 9 )
 		{
-			G_cp2all("Round %d of %d\n\n%s: %d\n\n"
-				"\x90%s\x91:%s \x90%s\x91:%s",
-				round_num, CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
+			G_cp2all("%s %d %s %d\n\n%s: %d\n\n"
+				"\x90%s\x91:%s %s \x90%s\x91:%s",
+                redtext("Round"), round_num, redtext("of"),
+				CA_rounds(), redtext("Countdown"), r, cvar_string("_k_team1"), dig3(team1_score), redtext("vs"),
+                cvar_string("_k_team2"), dig3(team2_score)); // CA_wins_required
 		}
 	}
 }
