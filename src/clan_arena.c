@@ -103,6 +103,8 @@ void CA_reset_round_stats(void)
     int from1 = 0;
     gedict_t *p;
 
+    G_cprint("CA_reset_round_stats\n");
+
     for( p = world; (p = find_plrghst( p, &from1 )); )
     {
         p->ps.ca_prernd_dmg_g       =   p->ps.dmg_g;                // damage given
@@ -113,6 +115,15 @@ void CA_reset_round_stats(void)
         p->ps.ca_prernd_rlv         =   p->ps.wpn[wpRL].rhits;      // RL virtual hits
         p->ps.ca_prernd_lga         =   p->ps.wpn[wpLG].attacks;    // LG attacks
         p->ps.ca_prernd_lgh         =   p->ps.wpn[wpLG].hits;       // LG real hits
+
+        G_cprint("%s|%f|%f|%f|%d|%d\n",
+        getname(p),
+        p->ps.ca_prernd_frags,
+        p->ps.ca_prernd_dmg_g,
+        p->ps.ca_prernd_dmg_g_rl,
+        p->ps.ca_prernd_rlh,
+        p->ps.ca_prernd_rlv
+        );
     }
 }
 
@@ -120,6 +131,8 @@ void CA_print_round_stats(void)
 {
     int from1 = 0;
     gedict_t *p;
+
+    G_cprint("CA_print_round_stats\n");
 
     G_bprint (PRINT_MEDIUM, "player     score  dmg rh rd skill  lgf lgh    lg%s\n", redtext("%") );
     G_bprint (PRINT_MEDIUM, "%s\n", redtext("---------- -----  --- -- -- -----  --- --- ------"));
@@ -157,7 +170,7 @@ void CA_change_pov(void)
     }
     self->trackent = NUM_FOR_EDICT( p ? p : world );
     if ( p )
-        G_sprint( self, 2, "%s %s\n", redtext("tracking"), getname( p )) ;
+        G_centerprint( self, "%s %s\n", redtext("tracking"), getname( p )) ;
 }
 
 void CA_dead_jump_button( void )
