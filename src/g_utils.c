@@ -425,7 +425,7 @@ char	*va(char *format, ...)
 	va_list		argptr;
 	static char		string[MAX_STRINGS*2][1024]; // qqshka - brrr
 	static int		index = 0;
-	
+
 	index %= MAX_STRINGS;
 	va_start (argptr, format);
 	Q_vsnprintf (string[index], sizeof(string[0]), format, argptr);
@@ -441,7 +441,7 @@ char *redtext(char *format)
 // >>>> like va(...)
 	static char	string[MAX_STRINGS][1024];
 	static int		index = 0;
-	
+
 	index %= MAX_STRINGS;
 	strlcpy(string[index], format ? format : "", sizeof(string[0]));
 // <<<<
@@ -462,7 +462,7 @@ char *cleantext(char *format)
 // >>>> like va(...)
 	static char	string[MAX_STRINGS][1024];
 	static int		index = 0;
-	
+
 	index %= MAX_STRINGS;
 	strlcpy(string[index], format ? format : "", sizeof(string[0]));
 // <<<<
@@ -505,7 +505,7 @@ char *dig3s(const char *format, ...)
 	va_list		argptr;
 	static char	string[MAX_STRINGS][32];
 	static int		index = 0;
-	
+
 	index %= MAX_STRINGS;
 	va_start (argptr, format);
 	Q_vsnprintf (string[index], sizeof(string[0]), format, argptr);
@@ -530,7 +530,7 @@ char *striphigh(char *format)
 // >>>> like va(...)
 	static char	string[MAX_STRINGS][1024];
 	static int		index = 0;
-	
+
 	index %= MAX_STRINGS;
 	strlcpy(string[index], format ? format : "", sizeof(string[0]));
 // <<<<
@@ -550,7 +550,7 @@ char *stripcaps(char *format)
 // >>>> like va(...)
 	static char	string[MAX_STRINGS][1024];
 	static int		index = 0;
-	
+
 	index %= MAX_STRINGS;
 	strlcpy(string[index], format ? format : "", sizeof(string[0]));
 // <<<<
@@ -629,7 +629,7 @@ void G_cprint( const char *fmt, ... )
 	va_end( argptr );
 
 	text[sizeof(text)-1] = 0;
-	
+
 	trap_conprint( text );
 }
 
@@ -746,7 +746,7 @@ void traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, floa
 }
 
 void TraceCapsule( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
-			float min_x, float min_y, float min_z, 
+			float min_x, float min_y, float min_z,
 			float max_x, float max_y, float max_z)
 {
 	trap_TraceCapsule( v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, nomonst, NUM_FOR_EDICT( ed ) ,
@@ -972,8 +972,13 @@ char *getteam( gedict_t * ed )
 
 	index %= MAX_STRINGS;
 
-	if ( num >= 1 && num <= MAX_CLIENTS )
-		team = ezinfokey(ed, "team");
+	if ( num >= 1 && num <= MAX_CLIENTS ) {
+        if ( isCA() && ra_match_fight >= 2 ) {
+             team = ed->ca_oldteam;
+        } else {
+	    	team = ezinfokey(ed, "team");
+        }
+    }
 	else if ( streq(ed->s.v.classname, "ghost") )
 		team = ezinfokey(world, va("%d", (int)ed->k_teamnum));
 	else {
@@ -1378,7 +1383,7 @@ qbool SetHandicap( gedict_t *p, int nhdc )
 	if ( cvar( "k_lock_hdp" ) )
 	{
 		G_sprint(self, 2, "%s changes are not allowed\n", redtext("handicap"));
-		return false;	
+		return false;
 	}
 
 	p->ps.handicap = nhdc; // set, unbound
@@ -1473,7 +1478,7 @@ int Get_Powerups ()
 	{
 		k_pow_new = CountPlayers() < k_pow_min_players ? 0 : k_pow_new;
 	}
-	
+
 	k_pow_check = g_globalvars.time + k_pow_check_time;
 
 	if ( k_pow != k_pow_new )
@@ -1530,7 +1535,7 @@ void ReScores()
 	int from;
 	char *team1, *team2;
 
-	// DO this by checking if k_nochange is 0. 
+	// DO this by checking if k_nochange is 0.
 	// which is set in ClientObituary in client.c
 	if( k_nochange )
 		return;
@@ -1557,7 +1562,7 @@ void ReScores()
 
 	ed_scores1 = NULL;
 	ed_scores2 = NULL;
-	
+
 	if ( ( isDuel() || isFFA() ) && CountPlayers() > 1 ) {
 		// no ghost serving
 		for ( p = world; (p = find_plr( p )); ) {
@@ -1685,7 +1690,7 @@ void CalculateBestPlayers()
 		best += ( ((int)p->s.v.items & IT_SUPER_SHOTGUN)
 				 				   && p->s.v.ammo_shells > 0  )   ?    50 : 0; // ssg with ammo
 		best += p->s.v.frags;
-	
+
 		if ( !ed_best1 ) { // select some first player as best
 			ed_best1 = p;
 			best1 = best;
@@ -1743,7 +1748,7 @@ void CalculateBestPowPlayers()
 		best += ( p->invisible_finished >= g_globalvars.time )    ? 1000 : 0; // ring
 		best += ( p->radsuit_finished >= g_globalvars.time )      ?  500 : 0; // suit
 		best += p->s.v.frags;
-	
+
 		if ( !ed_bestPow || best1 < best ) {
 			ed_bestPow = p;
 			best1 = best;
@@ -1944,7 +1949,7 @@ void on_connect()
 			stuffcmd_flags(self, STUFFCMD_IGNOREINDEMO, "on_connect\n");
 
 		if ( isCTF() && ( streq(newteam = getteam(self), "red") || streq(newteam, "blue") ) )
-			stuffcmd_flags(self, STUFFCMD_IGNOREINDEMO, "auto%s\n", newteam); 
+			stuffcmd_flags(self, STUFFCMD_IGNOREINDEMO, "auto%s\n", newteam);
 	}
 	else {
 		if ( isFFA() )
@@ -1958,7 +1963,7 @@ void on_connect()
 
 void on_enter()
 {
-	if ( iKey(self, "kf") & KF_ON_ENTER ) // client doesn't want on_enter 
+	if ( iKey(self, "kf") & KF_ON_ENTER ) // client doesn't want on_enter
 		return;
 
 	if ( self->ct == ctPlayer ) {

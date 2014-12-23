@@ -116,10 +116,8 @@ void CA_reset_round_stats(void)
         p->ps.ca_prernd_lga         =   p->ps.wpn[wpLG].attacks;    // LG attacks
         p->ps.ca_prernd_lgh         =   p->ps.wpn[wpLG].hits;       // LG real hits
 
-        G_cprint("%s|%f|%f|%f|%d|%d\n",
+        G_cprint("%s|%f|%d|%d\n",
         getname(p),
-        p->ps.ca_prernd_frags,
-        p->ps.ca_prernd_dmg_g,
         p->ps.ca_prernd_dmg_g_rl,
         p->ps.ca_prernd_rlh,
         p->ps.ca_prernd_rlv
@@ -149,7 +147,7 @@ void CA_print_round_stats(void)
         int lgh = p->ps.wpn[wpLG].hits - p->ps.ca_prernd_lgh;
 
         G_bprint (PRINT_MEDIUM, "%-10.10s    %2.0f %4.0f %2d %2d %5.1f   %2d  %2d %5.1f%s\n",
-            getname(p),frg,dmg,rlv,rlh,rlv ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga), redtext("%"));
+            getname(p),frg,dmg,rlv,rlh,rla ? ( drl / rlv ) : 0, lga, lgh, 100.0 * lgh  / max(1, lga), redtext("%"));
     }
 }
 
